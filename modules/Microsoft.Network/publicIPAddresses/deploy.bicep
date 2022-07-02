@@ -69,6 +69,15 @@ param roleAssignments array = []
 @description('Optional. Enable telemetry via the Customer Usage Attribution ID (GUID).')
 param enableDefaultTelemetry bool = true
 
+@description('Optional. The domain name label. The concatenation of the domain name label and the regionalized DNS zone make up the fully qualified domain name associated with the public IP address. If a domain name label is specified, an A DNS record is created for the public IP in the Microsoft Azure DNS system.')
+param domainNameLabel string = '${name}-domain'
+
+@description('Optional. The Fully Qualified Domain Name of the A DNS record associated with the public IP. This is the concatenation of the domainNameLabel and the regionalized DNS zone.')
+param fqdn string = ''
+
+@description('Optional. The reverse FQDN. A user-visible, fully qualified domain name that resolves to this public IP address. If the reverseFqdn is specified, then a PTR DNS record is created pointing from the IP address in the in-addr.arpa domain to the reverse FQDN.')
+param reverseFqdn string = ''
+
 @description('Optional. Tags of the resource.')
 param tags object = {}
 
@@ -130,7 +139,7 @@ resource defaultTelemetry 'Microsoft.Resources/deployments@2021-04-01' = if (ena
   }
 }
 
-resource publicIpAddress 'Microsoft.Network/publicIPAddresses@2021-05-01' = {
+resource publicIpAddress 'Microsoft.Network/publicIPAddresses@2021-08-01' = {
   name: name
   location: location
   tags: tags
@@ -145,6 +154,11 @@ resource publicIpAddress 'Microsoft.Network/publicIPAddresses@2021-05-01' = {
     publicIPPrefix: !empty(publicIPPrefixResourceId) ? publicIPPrefix : null
     idleTimeoutInMinutes: 4
     ipTags: []
+    dnsSettings: {
+      domainNameLabel: !empty(domainNameLabel) ? domainNameLabel : null
+      fqdn: !empty(fqdn) ? fqdn : null
+      reverseFqdn: !empty(reverseFqdn) ? reverseFqdn : null
+    }
   }
 }
 
