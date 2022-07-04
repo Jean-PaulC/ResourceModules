@@ -104,38 +104,10 @@ var diagnosticsMetrics = [for metric in diagnosticMetricsToEnable: {
   }
 }]
 
-var natGatewayPipName_var = (empty(natGatewayPipName) ? '${name}-pip' : natGatewayPipName)
-var natGatewayPublicIPPrefix = {
-  id: natGatewayPublicIPPrefixId
-}
-
-var natGatewayPropertyPublicIPPrefixes = [for publicIpPrefix in publicIpPrefixes: {
-  id: az.resourceId('Microsoft.Network/publicIPPrefixes', publicIpPrefix)
-}]
-var natGatewayPropertyPublicIPAddresses = [for publicIpAddress in publicIpAddresses: {
-  id: az.resourceId('Microsoft.Network/publicIPAddresses', publicIpAddress)
-}]
-var natGatewayProperties = {
-  idleTimeoutInMinutes: idleTimeoutInMinutes
-  publicIpPrefixes: natGatewayPropertyPublicIPPrefixes
-  publicIpAddresses: natGatewayPropertyPublicIPAddresses
-}
-
-resource defaultTelemetry 'Microsoft.Resources/deployments@2021-04-01' = if (enableDefaultTelemetry) {
-  name: 'pid-47ed15a6-730a-4827-bcb4-0fd963ffbd82-${uniqueString(deployment().name, location)}'
-  properties: {
-    mode: 'Incremental'
-    template: {
-      '$schema': 'https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#'
-      contentVersion: '1.0.0.0'
-      resources: []
-    }
-  }
-}
 
 // PUBLIC IP
 // =========
-resource publicIP 'Microsoft.Network/publicIPAddresses@2021-05-01' = if (natGatewayPublicIpAddress) {
+resource publicIP 'Microsoft.Network/publicIPAddresses@2021-03-01' = if (natGatewayPublicIpAddress) {
   name: natGatewayPipName_var
   location: location
   tags: tags
@@ -170,6 +142,37 @@ resource publicIP_diagnosticSettings 'Microsoft.Insights/diagnosticSettings@2021
   }
   scope: publicIP
 }
+
+
+var natGatewayPipName_var = (empty(natGatewayPipName) ? '${name}-pip' : natGatewayPipName)
+var natGatewayPublicIPPrefix = {
+  id: natGatewayPublicIPPrefixId
+}
+
+var natGatewayPropertyPublicIPPrefixes = [for publicIpPrefix in publicIpPrefixes: {
+  id: az.resourceId('Microsoft.Network/publicIPPrefixes', publicIpPrefix)
+}]
+var natGatewayPropertyPublicIPAddresses = [for publicIpAddress in publicIpAddresses: {
+  id: az.resourceId('Microsoft.Network/publicIPAddresses', publicIpAddress)
+}]
+var natGatewayProperties = {
+  idleTimeoutInMinutes: idleTimeoutInMinutes
+  publicIpPrefixes: natGatewayPropertyPublicIPPrefixes
+  publicIpAddresses: natGatewayPropertyPublicIPAddresses
+}
+
+resource defaultTelemetry 'Microsoft.Resources/deployments@2021-04-01' = if (enableDefaultTelemetry) {
+  name: 'pid-47ed15a6-730a-4827-bcb4-0fd963ffbd82-${uniqueString(deployment().name, location)}'
+  properties: {
+    mode: 'Incremental'
+    template: {
+      '$schema': 'https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#'
+      contentVersion: '1.0.0.0'
+      resources: []
+    }
+  }
+}
+
 
 // NAT GATEWAY
 // ===========
